@@ -1,0 +1,3 @@
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/ahmadfraz2k16/ecommerce_frontend.git
