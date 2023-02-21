@@ -5,6 +5,24 @@ from base.models import Product
 from base.serializers import ProductSerializer
 from .products import products
 
+# for customizing jwt token
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Added custom data in jwt token
+        token['username'] = user.username
+        token['message'] = "testing message"
+        return token
+
+# changing default serializer behaviour, in base/url we will get this customized user data
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
