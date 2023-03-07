@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 
 from base.models import Product
-from base.serializers import ProductSerializer
+from base.serializers import ProductSerializer, UserSerializer, UserSerializerwithToken
 from .products import products
 
 # for customizing jwt token
@@ -10,14 +10,14 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
+    def validate(self, attrs):
+        data = super().validate(attrs)
 
         # Added custom data in jwt token
-        token['username'] = user.username
-        token['message'] = "testing message"
-        return token
+        serializer = UserSerializerwithToken(self.user).data
+        for k, v in serializer.items():
+            data[k] = v
+        return data
 
 # changing default serializer behaviour, in base/url we will get this customized user data
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -44,6 +44,13 @@ def getRoutes(request):
         'api/products/<update>/<id>/',
     ]
     return Response(routes)
+
+# for user profile
+@api_view(['GET'])
+def getUserProfile(request):
+    user = request.user
+    serializer = UserSerializer(user, many=False)
+    return Response(serializer.data)
 
 # for all products
 @api_view(['GET'])
