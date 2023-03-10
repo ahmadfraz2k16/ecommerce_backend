@@ -5,6 +5,8 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from base.models import Product
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
+from rest_framework import status
 from base.serializers import ProductSerializer, UserSerializer, UserSerializerwithToken
 # from .products import products
 
@@ -52,6 +54,23 @@ def getUserProfile(request):
     user = request.user
     serializer = UserSerializer(user, many=False)
     return Response(serializer.data)
+
+# register user
+@api_view(['POST'])
+def userRegister(request):
+    data = request.data
+    try:
+        user = User.objects.create(
+        first_name = data['name'],
+        username = data['email'],
+        email = data['email'],
+        password = make_password(data['password'])
+        )
+        serializer = UserSerializerwithToken(user, many=False)
+        return Response(serializer.data)
+    except:
+        message = {'details': 'User with this email already exists'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 # for all users
 @api_view(['GET'])
