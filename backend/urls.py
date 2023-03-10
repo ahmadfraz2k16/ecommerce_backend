@@ -21,7 +21,9 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('base.urls')),
+    path('api/products/', include('base.urls.product_urls')),
+    path('api/users/', include('base.urls.user_urls')),
+    path('api/orders/', include('base.urls.order_urls')),
 ]
 # setting path for saving images in custom dir static/images & preview images from static/images
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
